@@ -1,6 +1,23 @@
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const nodemailer = require("nodemailer");
+const path = require("path");
+const handlebars = require("handlebars");
+const fs = require("fs");
+const qrCode = require("qrcode");
+const encodedToken = (data) => {
+  return jwt.sign(
+    {
+      iss: "Hiep Nguyen",
+      sub: data,
+    },
+    process.env.JWT_SECRET,
+    {
+      expiresIn: "10s",
+    }
+  );
+};
 
 const register = async (req, res) => {
   try {
@@ -22,50 +39,45 @@ const register = async (req, res) => {
       password: encryptedPassword,
     };
 
-    const saalik = await User.findOne({ email: "salikmubien@gmail.com" });
+    const hiepGa = await User.findOne({ email: "hiepga@gmail.com" });
 
-    if (saalik) {
-      userDoc.friends = [saalik._id];
+    if (hiepGa) {
+      userDoc.friends = [hiepGa._id];
     }
 
     // create user document and save in database
     const user = await User.create(userDoc);
 
-    if (saalik) {
-      saalik.friends = [...saalik.friends, user._id];
-      await saalik.save();
+    if (hiepGa) {
+      hiepGa.friends = [...hiepGa.friends, user._id];
+      await hiepGa.save();
     }
 
     // create JWT token
-    const token = jwt.sign(
-      {
-        userId: user._id,
-        email,
-        username: user.username,
-      },
-      process.env.JWT_SECRET,
-      {
-        expiresIn: "15d",
-      }
-    );
+    // const token = jwt.sign(
+    //   {
+    //     userId: user._id,
+    //     email,
+    //     username: user.username,
+    //     active: user.active,
+    //   },
+    //   process.env.JWT_SECRET,
+    //   {
+    //     expiresIn: "15d",
+    //   }
+    // );
 
-    res.status(201).json({
-      userDetails: {
-        _id: user._id,
-        email: user.email,
-        token: token,
-        username: user.username,
-      },
-    });
+   // const qrCode = await createQrCode(token);
+    res.status(201).send("register successfully")
   } catch (err) {
-    return res.status(500).send("Error occured. Please try again", err);
+    return res.status(500).send("Error occurred. Please try again", err);
   }
 };
 
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
-
+    console.log(req.body);
     const user = await User.findOne({ email: email.toLowerCase() });
 
     if (!user) {
@@ -84,10 +96,11 @@ const login = async (req, res) => {
         userId: user._id,
         email,
         username: user.username,
+        active: user.active,
       },
       process.env.JWT_SECRET,
       {
-        expiresIn: "15d",
+        expiresIn: "1d",
         // expiresIn: 60,
       }
     );
@@ -98,9 +111,206 @@ const login = async (req, res) => {
         email: user.email,
         token: token,
         username: user.username,
+        active: user.active,
       },
     });
   } catch (err) {
+    return res.status(500).send("Something went wrong. Please try again");
+  }
+};
+const refreshToken = async (req, res) => {
+  try {
+    const refreshToken = req.body.refreshToken;
+    console.log(refreshToken);
+    if (refreshToken) {
+      jwt.verify(refreshToken, process.env.JWT_SECRET, function (err, user) {
+        if (err) {
+          return res.status(404).json({
+            message: "The user is not authentication",
+          });
+        }
+        if (user) {
+          console.log(user);
+          const newAccessToken = encodedToken(user);
+          return res.json({
+            status: "OK",
+            access_token: newAccessToken,
+            user: user,
+          });
+        } else {
+          return res.json({
+            message: "The user is not authentication",
+          });
+        }
+      });
+    } else {
+      return res.json({
+        message: "The refreshToken is not valid",
+      });
+    }
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send("Something went wrong. Please try again");
+  }
+};
+
+const isJwtIdUsed = async (jti, userId) => {
+  try {
+    const check = await User.findOne({
+      _id: userId,
+      tokenResetPasswords: jti,
+    });
+    if (check) {
+      await User.updateOne(
+        { _id: userId, tokenResetPasswords: jti },
+        {
+          tokenResetPasswords: null,
+        }
+      );
+      console.log("done1");
+      return true;
+    } else {
+      return false;
+    }
+  } catch (error) {
+    return res.status(500).send("Something went wrong. Please try again");
+  }
+};
+
+const forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+    console.log(email);
+    const user = await User.findOne({ email: email }).exec();
+    if (user) {
+      // create transport object
+      let transporter = nodemailer.createTransport({
+        service: "gmail",
+        auth: {
+          user: process.env.email,
+          pass: process.env.password,
+        },
+      });
+      const jwtSecret = process.env.SECRET_KEY;
+      if (jwtSecret) {
+        const jti = require("crypto").randomBytes(16).toString("hex"); // tạo JWT ID ngẫu nhiên
+        const payload = {
+          id: user._id,
+          reset: true,
+          jti: jti,
+        };
+        console.log(payload);
+        const resetToken = jwt.sign(payload, jwtSecret, {
+          expiresIn: "1h",
+        });
+        const resetLink = `<a href="http://${process.env.CLIENT_URL}/auth/reset-password/${resetToken}" style="display: inline-block;color: #fff; text-decoration: none; background-color:#007bff; border-radius:12px">Reset Password</a>`;
+
+        const data = {
+          name: user.username,
+          link: resetLink,
+        };
+
+        const filePath = path.join(__dirname, "forgot-password.hbs");
+        const source = fs.readFileSync(filePath, "utf8");
+        const template = handlebars.compile(source);
+
+        await transporter.sendMail({
+          from: process.env.email,
+          to: req.body.email,
+          subject: "Password Reset",
+          // text: ` click here to reset your password ${resetLink} token will expire in 3m`,
+          html: template(data),
+        });
+        const addResetToken = await User.updateOne(
+          { _id: user._id },
+          { tokenResetPasswords: jti }
+        );
+        if (addResetToken) {
+          res.status(200).json({ message: "Password reset email sent" });
+        }
+      } else {
+        res.status(404).json({ message: "account not found" });
+      }
+    }
+  } catch (error) {
+    console.log(error);
+    return res.status(404).json(error);
+  }
+};
+
+const resetPassword = async (req, res) => {
+  try {
+    const decoded = jwt.verify(req.body.accessToken, process.env.SECRET_KEY);
+    const { pass } = req.body;
+    const { id } = decoded;
+    // encrypt password
+    const encryptedPassword = await bcrypt.hash(pass, 10);
+    const user = await User.updateOne(
+      { _id: id },
+      {
+        password: encryptedPassword,
+      }
+    );
+    return res.status(200).json(user);
+  } catch (error) {
+    return res.status(500).send("Something went wrong. Please try again");
+  }
+};
+
+const createQrCode = async (token) => {
+  try {
+    const qrCodeUrl = await qrCode.toDataURL(token);
+    console.log(qrCodeUrl);
+    return qrCodeUrl;
+  } catch (error) {
+    console.log(error);
+  }
+};
+const activeUser = async (req, res) => {
+  try {
+    const { token, password } = req.body;
+    const decodeToken = jwt.verify(token, process.env.JWT_SECRET);
+    if (decodeToken) {
+      const user = await User.findOne({ _id: decodeToken.userId });
+      if (user) {
+        const passwordsMatch = await bcrypt.compare(password, user.password);
+        if (!passwordsMatch) {
+          return res.status(400).send("Invalid credentials. Please try again");
+        }
+        const secretKey = Math.floor(Math.random() * 100) + 1;
+        const publicKey = process.env.g ** secretKey % process.env.p;
+        const activeUser = await User.findOneAndUpdate(
+          { _id: user._id },
+          { active: true, publicKey: publicKey }
+        );
+        if (activeUser) {
+          const token = jwt.sign(
+            {
+              userId: activeUser._id,
+              email:activeUser.email,
+              username: activeUser.username,
+              active: true,
+            },
+            process.env.JWT_SECRET,
+            {
+              // expiresIn: "1d",
+               expiresIn: "60d",
+            }
+          );
+          return res.status(200).json({
+            message: "Active user successfully",
+            privateKey: secretKey,
+            token : token
+          });
+        }
+        return res.status(500).send("Something went wrong. Please try again");
+      }
+      console.log("Something went wrong. Please try again");
+      return res.status(500).send("Something went wrong. Please try again");
+    }
+    return res.status(400).send("Something went wrong. Please try again");
+  } catch (error) {
+    console.log(error);
     return res.status(500).send("Something went wrong. Please try again");
   }
 };
@@ -108,4 +318,9 @@ const login = async (req, res) => {
 module.exports = {
   login,
   register,
+  refreshToken,
+  forgotPassword,
+  isJwtIdUsed,
+  activeUser,
+  resetPassword,
 };

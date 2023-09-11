@@ -4,7 +4,6 @@ const config = process.env;
 
 const requireSocketAuth = (socket, next) => {
     let token = socket.handshake.auth?.token
-
     if (!token) {
         return res.status(403).send("A token is required for authentication");
     }

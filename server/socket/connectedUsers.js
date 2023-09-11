@@ -1,9 +1,18 @@
 const connectedUsers = new Map();
+const connectedUsersAuth = new Map();
 let io = null;
-
+let ioAuth = null;
 const addNewConnectedUser = ({ socketId, userId }) => {
     connectedUsers.set(socketId, { userId });
 };
+const addNewConnectedAuth = ({ socketId }) => {
+    connectedUsersAuth.set(socketId)
+}
+const removeConnectedUserAuth = ({socketId}) => {
+    if (connectedUsersAuth.has(socketId)) {
+        connectedUsersAuth.delete(socketId);
+    }
+}
 
 const removeConnectedUser = ({ socketId }) => {
     if (connectedUsers.has(socketId)) {
@@ -38,6 +47,9 @@ const getOnlineUsers = () => {
     return onlineUsers;
 };
 
+const setServerSocketInstanceAuth = (ioInstance) => {
+    ioAuth = ioInstance
+}
 const setServerSocketInstance = (ioInstance) => {
     io = ioInstance;
 };
@@ -51,6 +63,9 @@ module.exports = {
     removeConnectedUser,
     getActiveConnections,
     setServerSocketInstance,
+    setServerSocketInstanceAuth,
     getServerSocketInstance,
     getOnlineUsers,
+    addNewConnectedAuth,
+    removeConnectedUserAuth,
 };

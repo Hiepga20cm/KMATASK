@@ -27,7 +27,8 @@ const updateUsersInvitations = async (userId, isNew) => {
     // send the list of invitations to all the active connections of this user(userId)
 
     const io = getServerSocketInstance();
-
+    console.log("active : ", activeConnections);
+    console.log("invitations", invitations) ;
     activeConnections.forEach(socketId => {
         io.to(socketId).emit("friend-invitations", invitations);
     })
