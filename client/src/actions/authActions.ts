@@ -1,38 +1,57 @@
 import { Dispatch,  } from "redux";
-import { login, register, getMe } from "../api/api";
-import { LoginArgs, RegisterArgs } from "../api/types";
+import { register, getMe } from "../api/api";
+import { RegisterArgs } from "../api/types";
 import { showAlert } from "./alertActions";
 import { resetChatAction } from "./chatActions";
 import { resetFriendsAction } from "./friendActions";
 import {actionTypes, CurrentUser} from "./types";
 
-
-export const loginUser = (credentials: LoginArgs) => {
-    return async (dispatch: Dispatch) => {
-        const response = await login(credentials);
-
-        if ("error" in response) {
-            dispatch({
-                type: actionTypes.authError,
-                payload: response.message
-            })
-
-            dispatch(showAlert(response.message));
-        } else {
-            localStorage.setItem("currentUser", JSON.stringify(response.userDetails));
+export const loginByQrCode = (data : any ) => {
+    if(data){
+        console.log(data);
+        
+        return async (dispatch : Dispatch) => {
+            localStorage.setItem("currentUser", JSON.stringify(data));
             dispatch({
                 type: actionTypes.authenticate,
-                payload: response.userDetails
+                payload: data            
             })
-
-           dispatch(
-               showAlert(
-                   `Hi, ${response.userDetails.username} 👋. Welcome back.`
-               )
-           );
+            dispatch(
+                showAlert(
+                 //    `Hi, ${response.userDetails.username} 👋. Welcome back.`
+                 "hi"
+                )
+            );
         }
     }
-} 
+}
+
+// export const loginUser = (credentials: LoginArgs) => {
+//     return async (dispatch: Dispatch) => {
+//         const response = await login(credentials);
+
+//         if ("error" in response) {
+//             dispatch({
+//                 type: actionTypes.authError,
+//                 payload: response.message
+//             })
+//             dispatch(showAlert(response.message));
+//         } else {
+//             localStorage.setItem("currentUser", JSON.stringify(response.userDetails));
+//             dispatch({
+//                 type: actionTypes.authenticate,
+//                 payload: response.userDetails
+//             })
+
+//            dispatch(
+//                showAlert(
+//                 //    `Hi, ${response.userDetails.username} 👋. Welcome back.`
+//                 "hi"
+//                )
+//            );
+//         }
+//     }
+// } 
 
 
 
@@ -48,18 +67,19 @@ export const registerUser = (credentials: RegisterArgs) => {
 
             dispatch(showAlert(response.message));
         } else {
-            localStorage.setItem(
-                "currentUser",
-                JSON.stringify(response.userDetails)
-            );
-            dispatch({
-                type: actionTypes.authenticate,
-                payload: response.userDetails,
-            });
+            // localStorage.setItem(
+            //     "currentUser",
+            //     JSON.stringify(response.userDetails)
+            // );
+            // dispatch({
+            //     type: actionTypes.qrCode,
+            //     //payload: response.userDetails,
+            //     payload:response.qrCode
+            // });
 
             dispatch(
                 showAlert(
-                    `Hi 👋 ${response.userDetails.username}. Welcome to TalkHouse. I'm Saalik, the creator of TalkHouse. You have me a as a friend till you invite and add your other friends 😊.`
+                     `Hi 👋. Welcome to KMA. I'm Hiep, the creator of KMA. Please, login by mobile App to active your account 😊.`
                 )
             );
         }
@@ -97,6 +117,7 @@ export const autoLogin = () => {
                     payload: {
                         ...response.me,
                         token: currentUser.token,
+                        privateKey : currentUser.privateKey,
                     },
                 });
             }
@@ -120,5 +141,13 @@ export const logoutUser = () => {
         dispatch({
             type: actionTypes.resetChat
         })
+    }
+}
+export const setSocketId = (socketId : any) => {
+    return async (dispatch: Dispatch) => {
+        dispatch({
+            type: actionTypes.socketId,
+            payload : socketId
+        });
     }
 }

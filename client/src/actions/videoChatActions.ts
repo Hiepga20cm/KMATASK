@@ -4,7 +4,6 @@ import SimplePeer from "simple-peer";
 import { actionTypes, CallStatus, ClearVideChatState } from "./types";
 import { showAlert } from "./alertActions";
 import { RootState } from "../store";
-import { currentPeerConnection, setCurrentPeerConnection } from "../socket/socketConnection";
 
 export const setLocalStream = (stream: MediaStream | null) => {
     return {

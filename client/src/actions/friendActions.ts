@@ -19,7 +19,7 @@ export const inviteFriend = (email: string, closeDialogHandler: () => void) => {
 };
 
 
-export const setPendingInvitations = (pendingInvitations: PendingInvitation[]) => {
+export const setPendingInvitations : any = (pendingInvitations: PendingInvitation[]) => {
     return {
         type: actionTypes.setPendingInvitations,
         payload: pendingInvitations,

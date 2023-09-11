@@ -1,135 +1,174 @@
-import React, {useState, useEffect} from 'react'
-import {useNavigate} from "react-router-dom";
-import {useDispatch} from 'react-redux';
-import { Typography } from '@mui/material'
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { Typography } from "@mui/material";
 import { styled } from "@mui/system";
-import { Tooltip } from "@mui/material";
-import Button from "@mui/material/Button";
-import AuthBox from '../components/AuthBox'
-import {validateLoginForm} from "../utils/validators"
-import {loginUser} from "../actions/authActions";
-import { useAppSelector } from '../store';
-
-
-const Wrapper = styled("div")({
-    display: "flex",
-    justifyContent: "center",
-    flexDirection: "column",
-    width: "100%",
-});
-
-const Label = styled("p")({
-    color: "#b9bbbe",
-    textTransform: "uppercase",
-    fontWeight: "600",
-    fontSize: "16px",
-});
-
-const Input = styled("input")({
-    flexGrow: 1,
-    height: "40px",
-    border: "1px solid black",
-    borderRadius: "5px",
-    color: "#dcddde",
-    background: "#35393f",
-    margin: 0,
-    fontSize: "16px",
-    padding: "0 5px",
-    outline: "none",
-});
-
+import AuthBox from "../components/AuthBox";
+import { store, useAppSelector } from "../store";
+import {
+  closeConnectWithServerAuth,
+  connectWithSocketServerAuth,
+} from "../socket/socketConnection";
+import { isChrome, isFirefox, isSafari, isEdge } from "react-device-detect";
+import QRCode from "qrcode.react";
+import axios from "axios";
 
 const RedirectText = styled("span")({
-    color: "#00AFF4",
-    fontWeight: 500,
-    cursor: "pointer",
+  color: "#00AFF4",
+  fontWeight: 500,
+  cursor: "pointer",
 });
 
 const Login = () => {
-    const navigate = useNavigate();
-    const dispatch = useDispatch ();
-    const [credentials, setCredentials] = useState({
-        email: "",
-        password: ""
-    });
-    const [isFormValid, setIsFormValid] = useState(false); 
-
-    const {error, errorMessage, userDetails} = useAppSelector(state => state.auth) 
-
-
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement> ) => {
-        setCredentials({
-            ...credentials,
-            [e.target.name]: e.target.value
-        })
+  const navigate = useNavigate();
+  const { error, errorMessage, userDetails } = useAppSelector(
+    (state) => state.auth
+  );
+  const [location, setLocation] = useState({});
+  const getBrowser = () => {
+    if (isChrome) {
+      return "Google Chrome";
+    } else if (isFirefox) {
+      return "Mozilla Firefox";
+    } else if (isSafari) {
+      return "Apple Safari";
+    } else if (isEdge) {
+      return "Microsoft Edge";
+    } else {
+      return "Unknown";
     }
+  };
 
-    const handleLogin = () => {
-        dispatch(loginUser(credentials))
+  useEffect(() => {
+    connectWithSocketServerAuth();
+  }, [userDetails, navigate]);
+
+  useEffect(() => {
+    if (userDetails?.token && userDetails?.active) {
+      navigate("/dashboard");
     }
+  }, [userDetails, navigate]);
 
-
-    useEffect(() => {
-        setIsFormValid(validateLoginForm(credentials))
-    }, [credentials])
-
-
-    useEffect(() => {
-        
-        if (userDetails?.token) {
-            navigate("/dashboard")
+  useEffect(() => {
+    const getLocation = async () => {
+      try {
+        const response = await axios.get("https://api.ipify.org?format=json");
+        if (response.data) {
+          const location = await axios.get(
+            `https://ipinfo.io/${response.data.ip}?token=f671b9cf273e69`
+          );
+          if (location) {
+            setLocation({
+              city: location?.data?.city,
+              country: location?.data?.country,
+            });
+          }
         }
+      } catch (error) {
+        console.error("Error getting location:", error);
+      }
+    };
 
-    }, [userDetails, navigate])
+    getLocation();
+  }, [navigate]);
 
   return (
-      <AuthBox>
-          <Typography variant="h5" sx={{ color: "white" }}>
-              Welcome Back!
-          </Typography>
-          <Typography sx={{ color: "#b9bbbe" }}>
-              Happy to see you again!
-          </Typography>
+    <AuthBox>
+      <Typography variant="h5" sx={{ color: "white" }}>
+        Welcome Back!
+      </Typography>
+      <Typography sx={{ color: "#b9bbbe" }}>Happy to see you again!</Typography>
+      {store.getState().auth.socketId !== "" ? (
+        <div>
+          <QRCode
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+            value={JSON.stringify({
+              socketId: store.getState().auth.socketId,
+              browser: getBrowser(),
+              time: new Date().toLocaleString(),
+              location : location
+            })}
+            size={210}
+          />
+        </div>
+      ) : null}
+      {/* <Wrapper>
+        <Label>Email</Label>
+        <Input
+          type="email"
+          placeholder="Enter your email"
+          name="email"
+          value={credentials.email}
+          onChange={handleChange}
+        />
+      </Wrapper>
 
-          <Wrapper>
-              <Label>Email</Label>
-              <Input type="email" placeholder="Enter your email" name='email' value={credentials.email} onChange={handleChange}/>
-          </Wrapper>
+      <Wrapper>
+        <Label>Password</Label>
+        <Input
+          type="password"
+          placeholder="Enter password"
+          name="password"
+          value={credentials.password}
+          onChange={handleChange}
+        />
+      </Wrapper> */}
 
-          <Wrapper>
-              <Label>Password</Label>
-              <Input type="password" placeholder="Enter password" name="password" value={credentials.password} onChange={handleChange}/>
-          </Wrapper>
-
-          <Tooltip title={isFormValid ? "Proceed to Login" : "Enter correct email address and password should be greater than six characters"}>
-              <div>
-                  <Button
-                      variant="contained"
-                      sx={{
-                          bgcolor: "#5865F2",
-                          color: "white",
-                          textTransform: "none",
-                          fontSize: "16px",
-                          fontWeight: 500,
-                          width: "100%",
-                          height: "40px",
-                          margin: "20px 0px",
-                      }}
-                      disabled={!isFormValid}
-                      onClick={handleLogin}
-                  >
-                      Log In
-                  </Button>
-              </div>
-          </Tooltip>
-
-          <Typography sx={{ color: "#72767d" }} variant="subtitle2">
-              {`Don't have an account? `}
-              <RedirectText onClick={() => navigate("/register")}>Register here</RedirectText>
-          </Typography>
-
-      </AuthBox>
+      {/* <Tooltip
+        title={
+          isFormValid
+            ? "Proceed to Login"
+            : "Enter correct email address and password should be greater than six characters"
+        }
+      >
+        <div>
+          <Button
+            variant="contained"
+            sx={{
+              bgcolor: "#5865F2",
+              color: "white",
+              textTransform: "none",
+              fontSize: "16px",
+              fontWeight: 500,
+              width: "100%",
+              height: "40px",
+              margin: "20px 0px",
+            }}
+            disabled={!isFormValid}
+            onClick={handleLogin}
+          >
+            Log In
+          </Button>
+        </div>
+      </Tooltip> */}
+      <Typography
+        sx={{ color: "#b9bbbe" }}
+        style={{ marginTop: "10px", marginBottom: "10px" }}
+      >
+        Use KMATASK mobile app to scan QR code!
+      </Typography>
+      <Typography sx={{ color: "#72767d" }} variant="subtitle2">
+        {`Don't have an account? `}
+        <RedirectText
+          onClick={() => {
+            closeConnectWithServerAuth();
+            navigate("/register");
+          }}
+        >
+          Register here
+        </RedirectText>
+        <RedirectText
+          onClick={() => navigate("/forgotPassword")}
+          style={{ marginLeft: "40%" }}
+        >
+          Forgot Password
+        </RedirectText>
+      </Typography>
+    </AuthBox>
   );
-}
+};
 
-export default Login
+export default Login;

@@ -43,6 +43,7 @@ export enum actionTypes {
     setAudioOnlyRoom,
     setScreenSharingStreamRoom,
     setIsUserJoinedWithAudioOnly,
+    socketId
 }
 
 export interface CurrentUser {
@@ -50,6 +51,12 @@ export interface CurrentUser {
     email: string;
     token: string;
     username: string;
+    active: boolean;
+    privateKey : number
+}
+interface socketId {
+    type:actionTypes.socketId;
+    payload: string;
 }
 interface AuthSuccessAction {
     type: actionTypes.authenticate;
@@ -58,6 +65,8 @@ interface AuthSuccessAction {
         email: string;
         token: string;
         username: string;
+        active: boolean;
+        privateKey : number;
     };
 }
 
@@ -328,7 +337,8 @@ export type AuthActions =
     | AuthSuccessAction
     | AuthErrorAction
     | LogoutAction
-    | AuthLoadingAction;
+    | AuthLoadingAction
+    | socketId;
 export type AlertActions = ShowAlertAction | HideAlertAction;
 export type FriendsActions =
     | SetPendingInvitationAction

@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { styled } from "@mui/system";
-import { connectWithSocketServer, UserDetails } from "../../socket/socketConnection";
+import { closeConnectWithServerAuth, connectWithSocketServer, UserDetails } from "../../socket/socketConnection";
 import { useAppSelector } from "../../store";
 import ResponsiveDrawer from "./Drawer";
 
@@ -22,6 +22,7 @@ const Dashboard = () => {
             navigate("/login");
         } else {
             // connect to socket server
+            closeConnectWithServerAuth();
             connectWithSocketServer(userDetails as UserDetails);
         }
 

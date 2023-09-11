@@ -7,157 +7,153 @@ import { Tooltip } from "@mui/material";
 import Button from "@mui/material/Button";
 import AuthBox from "../components/AuthBox";
 import { validateRegisterForm } from "../utils/validators";
-import { useAppSelector } from "../store";
+//import { useAppSelector } from "../store";
 import { registerUser } from "../actions/authActions";
+//import { io, Socket } from "socket.io-client";
 
 const Wrapper = styled("div")({
-    display: "flex",
-    justifyContent: "center",
-    flexDirection: "column",
-    width: "100%",
+  display: "flex",
+  justifyContent: "center",
+  flexDirection: "column",
+  width: "100%",
 });
 
 const Label = styled("p")({
-    color: "#b9bbbe",
-    textTransform: "uppercase",
-    fontWeight: "600",
-    fontSize: "16px",
+  color: "#b9bbbe",
+  textTransform: "uppercase",
+  fontWeight: "600",
+  fontSize: "16px",
 });
-
 const Input = styled("input")({
-    flexGrow: 1,
-    height: "40px",
-    border: "1px solid black",
-    borderRadius: "5px",
-    color: "#dcddde",
-    background: "#35393f",
-    margin: 0,
-    fontSize: "16px",
-    padding: "0 5px",
-    outline: "none",
+  flexGrow: 1,
+  height: "40px",
+  border: "1px solid black",
+  borderRadius: "5px",
+  color: "#dcddde",
+  background: "#35393f",
+  margin: 0,
+  fontSize: "16px",
+  padding: "0 5px",
+  outline: "none",
 });
 
 const RedirectText = styled("span")({
-    color: "#00AFF4",
-    fontWeight: 500,
-    cursor: "pointer",
+  color: "#00AFF4",
+  fontWeight: 500,
+  cursor: "pointer",
 });
 
 const Register = () => {
-    const navigate = useNavigate();
-    const [credentials, setCredentials] = useState({
-        email: "",
-        password: "",
-        username: ""
+  const navigate = useNavigate();
+  const [credentials, setCredentials] = useState({
+    email: "",
+    password: "",
+    username: "",
+  });
+  const [isFormValid, setIsFormValid] = useState(false);
+  // const { error, errorMessage, userDetails } = useAppSelector(
+  //   (state) => state.auth
+  // );
+
+  const dispatch = useDispatch();
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setCredentials({
+      ...credentials,
+      [e.target.name]: e.target.value,
     });
-    const [isFormValid, setIsFormValid] = useState(false);
+  };
 
-    const { error, errorMessage, userDetails } = useAppSelector(
-        (state) => state.auth
-    );
+  const handleRegister = () => {
+    dispatch(registerUser(credentials));
+  };
 
-    const dispatch = useDispatch();
+  useEffect(() => {
+    setIsFormValid(validateRegisterForm(credentials));
+  }, [credentials]);
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setCredentials({
-            ...credentials,
-            [e.target.name]: e.target.value,
-        });
-    };
+  // useEffect(() => {
+  //     navigate("/login");
+  // }, [navigate]);
 
-    const handleRegister = () => {
-        dispatch(registerUser(credentials));
-    };
+  return (
+    <AuthBox>
+          <Typography variant="h5" sx={{ color: "white" }}>
+            Welcome!
+          </Typography>
+          <Typography sx={{ color: "#b9bbbe" }}>
+            Create an account to get started.
+          </Typography>
 
-    useEffect(() => {
-        setIsFormValid(validateRegisterForm(credentials));
-    }, [credentials]);
+          <Wrapper>
+            <Label>Username</Label>
+            <Input
+              type="email"
+              placeholder="Enter your username"
+              name="username"
+              value={credentials.username}
+              onChange={handleChange}
+            />
+          </Wrapper>
 
+          <Wrapper>
+            <Label>Email</Label>
+            <Input
+              type="email"
+              placeholder="Enter your email"
+              name="email"
+              value={credentials.email}
+              onChange={handleChange}
+            />
+          </Wrapper>
 
-    useEffect(() => {
-        if (userDetails?.token) {
-            navigate("/dashboard");
-        }
-    }, [userDetails, navigate]);
+          <Wrapper>
+            <Label>Password</Label>
+            <Input
+              type="password"
+              placeholder="Enter password"
+              name="password"
+              value={credentials.password}
+              onChange={handleChange}
+            />
+          </Wrapper>
 
-    return (
-        <AuthBox>
-            <Typography variant="h5" sx={{ color: "white" }}>
-                Welcome!
-            </Typography>
-            <Typography sx={{ color: "#b9bbbe" }}>
-                Create an account to get started.
-            </Typography>
+          <Tooltip
+            title={
+              isFormValid
+                ? "Proceed to Register"
+                : "Enter correct email address. Password should be greater than six characters and username should be between 3 and 12 characters!"
+            }
+          >
+            <div>
+              <Button
+                variant="contained"
+                sx={{
+                  bgcolor: "#5865F2",
+                  color: "white",
+                  textTransform: "none",
+                  fontSize: "16px",
+                  fontWeight: 500,
+                  width: "100%",
+                  height: "40px",
+                  margin: "20px 0px",
+                }}
+                disabled={!isFormValid}
+                onClick={handleRegister}
+              >
+                Sign Up
+              </Button>
+            </div>
+          </Tooltip>
 
-            <Wrapper>
-                <Label>Username</Label>
-                <Input
-                    type="email"
-                    placeholder="Enter your username"
-                    name="username"
-                    value={credentials.username}
-                    onChange={handleChange}
-                />
-            </Wrapper>
-
-            <Wrapper>
-                <Label>Email</Label>
-                <Input
-                    type="email"
-                    placeholder="Enter your email"
-                    name="email"
-                    value={credentials.email}
-                    onChange={handleChange}
-                />
-            </Wrapper>
-
-            <Wrapper>
-                <Label>Password</Label>
-                <Input
-                    type="password"
-                    placeholder="Enter password"
-                    name="password"
-                    value={credentials.password}
-                    onChange={handleChange}
-                />
-            </Wrapper>
-
-            <Tooltip
-                title={
-                    isFormValid
-                        ? "Proceed to Register"
-                        : "Enter correct email address. Password should be greater than six characters and username should be between 3 and 12 characters!"
-                }
-            >
-                <div>
-                    <Button
-                        variant="contained"
-                        sx={{
-                            bgcolor: "#5865F2",
-                            color: "white",
-                            textTransform: "none",
-                            fontSize: "16px",
-                            fontWeight: 500,
-                            width: "100%",
-                            height: "40px",
-                            margin: "20px 0px",
-                        }}
-                        disabled={!isFormValid}
-                        onClick={handleRegister}
-                    >
-                        Sign Up
-                    </Button>
-                </div>
-            </Tooltip>
-
-            <Typography sx={{ color: "#72767d" }} variant="subtitle2">
-                {`Already have an account? `}
-                <RedirectText onClick={() => navigate("/login")}>
-                    Log In
-                </RedirectText>
-            </Typography>
-        </AuthBox>
-    );
+          <Typography sx={{ color: "#72767d" }} variant="subtitle2">
+            {`Already have an account? `}
+            <RedirectText onClick={() => navigate("/login")}>
+              Log In
+            </RedirectText>
+          </Typography>
+    </AuthBox>
+  );
 };
 
 export default Register;

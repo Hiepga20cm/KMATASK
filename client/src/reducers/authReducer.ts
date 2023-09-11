@@ -7,7 +7,9 @@ interface AuthState {
         email: string;
         token: string;
         username: string;
+        active: boolean;
     } | null;
+    socketId : string;
     error: boolean;
     errorMessage: string;
     loading: boolean;
@@ -15,6 +17,7 @@ interface AuthState {
 
 const initialState: AuthState = {
     userDetails: null,
+    socketId : "",
     error: false,
     errorMessage: "",
     loading: false,
@@ -30,6 +33,7 @@ const authReducer: Reducer<AuthState, AuthActions> = (
                 error: false,
                 errorMessage: "",
                 userDetails: action.payload,
+                socketId : "",
                 loading: false,
             };
 
@@ -38,6 +42,7 @@ const authReducer: Reducer<AuthState, AuthActions> = (
                 ...state,
                 error: true,
                 errorMessage: action.payload,
+                socketId : "",
                 loading: false,
             };
 
@@ -46,6 +51,7 @@ const authReducer: Reducer<AuthState, AuthActions> = (
                 error: false,
                 errorMessage: "",
                 userDetails: null,
+                socketId : "",
                 loading: false,
             };
         case actionTypes.authLoading:
@@ -53,9 +59,17 @@ const authReducer: Reducer<AuthState, AuthActions> = (
                 error: false,
                 errorMessage: "",
                 userDetails: null,
+                socketId : "",
                 loading: action.payload,
             };
-
+        case actionTypes.socketId:
+            return {
+                error: false,
+                errorMessage: "",
+                userDetails: null,
+                socketId : action.payload,
+                loading: false,
+            };
         default:
             return state;
     }
