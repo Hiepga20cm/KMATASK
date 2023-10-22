@@ -183,9 +183,27 @@ const deleteGroup = async (req, res) => {
     }
 };
 
+const getConfig = async (req, res) => {
+    try {
+        const config = {
+            salt :process.env.salt,
+            p : process.env.p,
+            g : process.env.g
+        }
+        if (config){
+            res.status(200).json(config)
+        }
+    } catch (error) {
+        console.log(err);
+        return res
+            .status(500)
+            .send("Sorry, something went wrong. Can not get config");
+    }
+}
 module.exports = {
     createGroupChat,
     addMemberToGroup,
     leaveGroup,
     deleteGroup,
+    getConfig
 };

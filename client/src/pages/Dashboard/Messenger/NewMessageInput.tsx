@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { styled } from "@mui/system";
 import { useAppSelector } from "../../../store";
 import { notifyTyping, sendDirectMessage, sendGroupMessage } from "../../../socket/socketConnection";
-
+import * as CryptoJS from "crypto-js";
 const MainContainer = styled("div")({
     height: "60px",
     width: "100%",
@@ -30,18 +30,40 @@ const NewMessageInput: React.FC = () => {
     const onBlur = () => setFocused(false);
 
     const { chosenChatDetails, chosenGroupChatDetails } = useAppSelector((state) => state.chat);
+    const {salt, p} = useAppSelector((state) => state.config)
+    const powerMod = (base:any, exponent:any, modulus:any) => {
+        let result = 1
+        base = base % modulus
+        while (exponent > 0) {
+            if (exponent % 2 === 1) {
+                result = (result * base) % modulus
+            }
+            exponent = Math.floor(exponent / 2)
+            base = (base * base) % modulus
+        }
+        return result
+    }
 
-
-
-    const handleSendMessage = (e: React.KeyboardEvent<HTMLInputElement>) => {
-        
+    const handleSendMessage = async (e: React.KeyboardEvent<HTMLInputElement>) => {
+        try {
         if (e.key === "Enter") {
             
             if(chosenChatDetails) {
-                sendDirectMessage({
+                const userDetails: any = localStorage.getItem("currentUser");
+                if (userDetails) {
+                  const privateKey = JSON.parse(userDetails).privateKey;
+                  const keyEncrypted = powerMod(chosenChatDetails.publicKey, privateKey, p)
+                  const saltedMessage = salt.toString() + keyEncrypted.toString()
+                  const hash = CryptoJS.MD5(saltedMessage)
+                  const encryptedMessage:string = CryptoJS.AES.encrypt(
                     message,
-                    receiverUserId: chosenChatDetails.userId!,
-                });
+                    `${hash}`
+                ).toString()
+                  sendDirectMessage({
+                      message:encryptedMessage,
+                      receiverUserId: chosenChatDetails.userId!,
+                  });
+                }
             }
             
             if(chosenGroupChatDetails) {
@@ -54,6 +76,10 @@ const NewMessageInput: React.FC = () => {
 
             setMessage("");
         }
+    } catch (error) {
+           console.log(error);
+            
+    }
     };
 
 

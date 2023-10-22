@@ -29,8 +29,9 @@ export type AuthResponse = {
     active: boolean;
   };
 };
-export type QrResponse = { 
-    qrCode: string;
+export type  RegisterResponse = { 
+    status : number;
+    message : string;
 };
 
 export type GetMeResponse = {

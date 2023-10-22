@@ -57,26 +57,14 @@ export const loginByQrCode = (data : any ) => {
 
 export const registerUser = (credentials: RegisterArgs) => {
     return async (dispatch: Dispatch) => {
-        const response = await register(credentials);
-
-        if ("error" in response) {
+        const response : any = await register(credentials);
+        if (response.status !== 200) {
             dispatch({
                 type: actionTypes.authError,
                 payload: response.message,
             });
-
             dispatch(showAlert(response.message));
         } else {
-            // localStorage.setItem(
-            //     "currentUser",
-            //     JSON.stringify(response.userDetails)
-            // );
-            // dispatch({
-            //     type: actionTypes.qrCode,
-            //     //payload: response.userDetails,
-            //     payload:response.qrCode
-            // });
-
             dispatch(
                 showAlert(
                      `Hi 👋. Welcome to KMA. I'm Hiep, the creator of KMA. Please, login by mobile App to active your account 😊.`

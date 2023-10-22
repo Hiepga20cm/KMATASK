@@ -3,23 +3,23 @@ import { styled } from "@mui/system";
 import FriendsListItem from "./FriendsListItem";
 import { useAppSelector } from "../../../../store";
 
-const DUMMY_FRIENDS = [
-  {
-    id: "1",
-    username: "Mark",
-    isOnline: true,
-  },
-  {
-    id: "2",
-    username: "Anna",
-    isOnline: false,
-  },
-  {
-    id: "3",
-    username: "John",
-    isOnline: false,
-  },
-];
+// const DUMMY_FRIENDS = [
+//   {
+//     id: "1",
+//     username: "Mark",
+//     isOnline: true,
+//   },
+//   {
+//     id: "2",
+//     username: "Anna",
+//     isOnline: false,
+//   },
+//   {
+//     id: "3",
+//     username: "John",
+//     isOnline: false,
+//   },
+// ];
 
 const MainContainer = styled("div")({
   flexGrow: 1,
@@ -45,6 +45,7 @@ const FriendsList = () => {
           key={f.id}
           isOnline={f.isOnline}
           email= {f.email}
+          publicKey={f.publicKey}
         />
       ))}
     </MainContainer>

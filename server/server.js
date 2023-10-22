@@ -8,14 +8,14 @@ const mongoose = require("mongoose");
 const authRoutes = require("./routes/authRoutes");
 const friendInvitationRoutes = require("./routes/friendInvitationRoutes");
 const groupChatRoutes = require("./routes/groupChatRoutes");
-
+const configRoutes = require("./routes/getConfigEnv")
 const {
   createSocketServer,
   createSocketServerAuth,
 } = require("./socket/socketServer");
 
 const PORT = process.env.PORT || 5000;
-
+const PORTSOCKET = process.env.PORTSOCKET || 5001
 const app = express();
 app.use(express.json());
 app.use(cors());
@@ -24,6 +24,7 @@ app.use(cors());
 app.use("/api/auth", authRoutes);
 app.use("/api/invite-friend", friendInvitationRoutes);
 app.use("/api/group-chat", groupChatRoutes);
+app.use("/api/config",configRoutes);
 
 const appAuth = express();
 appAuth.use(express.json());
@@ -40,19 +41,19 @@ const server = http.createServer(app);
 createSocketServer(server);
 createSocketServerAuth(serverAuth);
 
-// const MONGO_URI =
-//   process.env.NODE_ENV === "production"
-//     ? process.env.MONGO_URI
-//     : process.env.MONGO_URI_DEV;
+const MONGO_URI =
+  process.env.NODE_ENV === "dev"
+    ? process.env.MONGO_URI
+    : process.env.MONGO_URI_DEV;
 
 mongoose
-  .connect("mongodb://0.0.0.0:27017/talkHouse")
+  .connect(MONGO_URI)
   .then(() => {
     server.listen(PORT, "0.0.0.0", () => {
       console.log(`SERVER STARTED ON ${PORT}.....!`);
     });
-    serverAuth.listen(5001, "0.0.0.0", () => {
-      console.log(`SERVER STARTED ON ${5001}.....!`);
+    serverAuth.listen(PORTSOCKET, "0.0.0.0", () => {
+      console.log(`SERVER STARTED ON ${PORTSOCKET}.....!`);
     });
   })
   .catch((err) => {

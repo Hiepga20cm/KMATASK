@@ -1,13 +1,14 @@
 import { createStore, combineReducers, applyMiddleware } from "redux";
 import thunk from "redux-thunk";
 import { composeWithDevTools } from "redux-devtools-extension";
-import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
+import { TypedUseSelectorHook, useSelector } from "react-redux";
 import { authReducer } from "../reducers/authReducer";
 import { alertReducer } from "../reducers/alertReducer";
 import { friendsReducer } from "../reducers/friendsReducer";
 import { chatReducer } from "../reducers/chatReducer";
 import videoChatReducer from "../reducers/videoChatReducer";
 import { roomReducer } from "../reducers/roomReducer";
+import { configReducer } from "../reducers/configReducer";
 
 const rootReducer = combineReducers({
     auth: authReducer,
@@ -15,7 +16,8 @@ const rootReducer = combineReducers({
     friends: friendsReducer,
     chat: chatReducer,
     videoChat: videoChatReducer,
-    room: roomReducer
+    room: roomReducer,
+    config: configReducer
 });
 
 const store = createStore(
@@ -27,7 +29,7 @@ const store = createStore(
 // type RootState = ReturnType<typeof store.getState>;
 export type RootState = ReturnType<typeof rootReducer>;
 
-type AppDispatch = typeof store.dispatch;
+//type AppDispatch = typeof store.dispatch;
 
 // const useAppDispatch = () => useDispatch<AppDispatch>();
 // export const useAppDispatch: () => AppDispatch = useDispatch;                                  

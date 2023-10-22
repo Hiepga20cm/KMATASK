@@ -10,7 +10,6 @@ const requireAuth = (req, res, next) => {
       .send("Unauthorized. A token is required for authentication");
   }
   try {
-    // token = token.replace(/^Bearer\s+/, "");
     token = token.split(" ")[1];
     const decoded = jwt.verify(token, config.JWT_SECRET);
     req.user = decoded;

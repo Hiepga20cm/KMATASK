@@ -43,7 +43,8 @@ export enum actionTypes {
     setAudioOnlyRoom,
     setScreenSharingStreamRoom,
     setIsUserJoinedWithAudioOnly,
-    socketId
+    socketId,
+    setConfig
 }
 
 export interface CurrentUser {
@@ -106,8 +107,13 @@ export interface Friend {
     id: string;
     username: string;
     email: string;
+    publicKey:number;
 }
-
+export interface Config {
+    salt : string;
+    p: number;
+    g: number;
+}
 export interface OnlineUser {
     userId: string;
     socketId: string;
@@ -153,6 +159,7 @@ export interface SetChosenChatDetails {
     payload: {
         userId: string;
         username: string;
+        publicKey : number;
     };
 }
 
@@ -176,6 +183,7 @@ export interface Message {
         username: string;
         _id: string;
     };
+    type : string ;
     createdAt: string;
 }
 
@@ -333,6 +341,15 @@ interface SetRoomDetails {
     };
 }
 
+interface SetConfig {
+    type : actionTypes.setConfig;
+    payload: {
+        salt:string;
+        p:number;
+        g:number
+    }
+}
+
 export type AuthActions =
     | AuthSuccessAction
     | AuthErrorAction
@@ -373,3 +390,5 @@ export type RoomActions =
     | SetOpenRoom
     | SetRoomDetails
     | SetScreenSharingStreamRoom;
+export type ConfigAction = 
+    | SetConfig;

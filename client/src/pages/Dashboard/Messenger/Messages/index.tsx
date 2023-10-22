@@ -8,6 +8,7 @@ import { fetchDirectChatHistory, fetchGroupChatHistory } from "../../../../socke
 import { Message as MessageType } from "../../../../actions/types";
 import DateSeparator from "./DateSeparator";
 import { Typography } from "@mui/material";
+import * as CryptoJS from "crypto-js";
 
 
 const MainContainer = styled("div")({
@@ -24,9 +25,37 @@ const Messages = () => {
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const [scrollPosition, setScrollPosition] = useState(0);
     const {chat, auth: {userDetails}} = useAppSelector((state) => state);
-
+    const {salt, p} = useAppSelector((state) => state.config)
+    const [key, setKey] = useState('')
     const { chosenChatDetails, messages, chosenGroupChatDetails } = chat;
-
+    const powerMod = (base:any, exponent:any, modulus:any) => {
+        let result = 1
+        base = base % modulus
+        while (exponent > 0) {
+            if (exponent % 2 === 1) {
+                result = (result * base) % modulus
+            }
+            exponent = Math.floor(exponent / 2)
+            base = (base * base) % modulus
+        }
+        return result
+    }
+    const getKey = (chosenChatDetails : any) => {
+        try {
+            if (salt && p) {
+                const userDetails: any = localStorage.getItem("currentUser");
+                const privateKey = JSON.parse(userDetails).privateKey;
+                const keyEncrypted = powerMod(chosenChatDetails?.publicKey, privateKey, p)
+                const saltedMessage : string = salt.toString() + keyEncrypted.toString()
+                const hash :any = CryptoJS.MD5(saltedMessage)
+                setKey(hash)
+            }
+        } catch (error) {
+            console.log(error);
+            
+        }
+        
+    }
     const sameAuthor = (message: MessageType, index: number) => {
 
         if (index === 0) {
@@ -46,17 +75,25 @@ const Messages = () => {
     };
     
     useEffect(() => {
-        if (chosenChatDetails) {
-            fetchDirectChatHistory({
-                receiverUserId: chosenChatDetails.userId,
-            });
-        }
-
-        if(chosenGroupChatDetails) {
-            fetchGroupChatHistory({
-                groupChatId: chosenGroupChatDetails.groupId
-            })
-        }
+        const fetchChatHistory = async() => {
+            try {
+                if (chosenChatDetails) {
+                    getKey(chosenChatDetails)
+                    fetchDirectChatHistory({
+                        receiverUserId: chosenChatDetails.userId,
+                    });
+                }
+        
+                if(chosenGroupChatDetails) {
+                    fetchGroupChatHistory({
+                        groupChatId: chosenGroupChatDetails.groupId
+                    })
+                }
+            } catch (error) {
+                console.log(error);
+            }
+        } 
+        fetchChatHistory()
     }, [chosenChatDetails, chosenGroupChatDetails]);
 
 
@@ -94,7 +131,11 @@ const Messages = () => {
 
                 const incomingMessage =
                     message.author._id !== (userDetails as any)._id;
-
+                const rawMessage = CryptoJS.AES.decrypt(
+                    message.content,
+                    `${key}`
+                ).toString(CryptoJS.enc.Utf8)
+                const type = message.type
                 return (
                     <div key={message._id} style={{ width: "97%" }}>
                         {(!isSameDay || index === 0) && (
@@ -102,7 +143,7 @@ const Messages = () => {
                         )}
 
                         <Message
-                            content={message.content}
+                            content={ type === "DIRECT" ? rawMessage : message.content}
                             username={message.author.username}
                             sameAuthor={sameAuthor(message, index)}
                             date={message.createdAt}

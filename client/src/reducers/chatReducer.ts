@@ -15,6 +15,7 @@ interface Message {
         _id: string;
     }
     createdAt: string,
+    type : string
 }
 
 
@@ -23,6 +24,7 @@ interface ChatState {
     chosenChatDetails: {
         userId: string;
         username: string;
+        publicKey: number;
     } | null;
     chosenGroupChatDetails: {
         groupId: string;

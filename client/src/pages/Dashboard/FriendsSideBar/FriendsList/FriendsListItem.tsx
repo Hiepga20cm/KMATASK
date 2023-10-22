@@ -15,6 +15,7 @@ interface FriendsListItemProps {
     username: string;
     email: string;
     isOnline: boolean;
+    publicKey: number;
 }
 
 const FriendsListItem = ({
@@ -22,6 +23,7 @@ const FriendsListItem = ({
     username,
     isOnline,
     email,
+    publicKey,
 }: FriendsListItemProps) => {
     const theme = useTheme();
     const matches = useMediaQuery(theme.breakpoints.up("sm"));
@@ -42,7 +44,7 @@ const FriendsListItem = ({
         <Tooltip title={email}>
             <Button
                 onClick={() => {
-                    dispatch(setChosenChatDetails({ userId: id, username }));
+                    dispatch(setChosenChatDetails({ userId: id, username, publicKey }));
                 }}
                 style={{
                     width: "100%",

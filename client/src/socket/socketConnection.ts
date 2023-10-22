@@ -54,6 +54,7 @@ interface Friend {
   id: string;
   username: string;
   email: string;
+  publicKey: number;
 }
 
 interface OnlineUser {
@@ -202,9 +203,8 @@ const connectWithSocketServerAuth = () => {
     );
   });
   socket.on("data-qr-login", (data) => {
-    console.log("dataQr in client", data);
-    if(data){
-      store.dispatch(loginByQrCode(data) as any )
+    if (data) {
+      store.dispatch(loginByQrCode(data) as any);
     }
   });
 };
@@ -231,8 +231,6 @@ const connectWithSocketServer = (userDetails: UserDetails) => {
   socket.emit("helloFomClient");
 
   socket.on("friend-invitations", (data) => {
-    console.log(data);
-    
     store.dispatch(setPendingInvitations(data) as any);
   });
 

@@ -11,7 +11,7 @@ import {
   DeleteGroupArgs,
   ForgotPasswordResponse,
   ResetPasswordArgs,
-  QrResponse,
+  RegisterResponse,
 } from "./types";
 //import jwtDecode from "jwt-decode";
 
@@ -105,13 +105,12 @@ export const login = async ({ email, password }: LoginArgs) => {
 export const register = async ({ email, password, username }: RegisterArgs) => {
   try {
     //const res = await api.post<AuthResponse>("/api/auth/register", {
-    const res = await api.post<QrResponse>("/api/auth/register", {
+    const res = await api.post<RegisterResponse>("/api/auth/register", {
       email,
       password,
       username,
-    }); 
-
-    return res.data;
+    });
+    return res;
   } catch (err: any) {
     return {
       error: true,
@@ -261,6 +260,20 @@ export const deleteGroup = async (data: DeleteGroupArgs) => {
     return res.data;
   } catch (err: any) {
     checkForAuthorization(err);
+    return {
+      error: true,
+      message: err.response.data,
+    };
+  }
+};
+
+export const getConfig = async () => {
+  try {
+    const res = await api.get("/api/config/getConfig");
+    console.log("config:", res.data);
+
+    return res.data;
+  } catch (err: any) {
     return {
       error: true,
       message: err.response.data,

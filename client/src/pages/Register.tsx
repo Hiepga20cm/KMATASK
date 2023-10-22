@@ -7,10 +7,8 @@ import { Tooltip } from "@mui/material";
 import Button from "@mui/material/Button";
 import AuthBox from "../components/AuthBox";
 import { validateRegisterForm } from "../utils/validators";
-//import { useAppSelector } from "../store";
 import { registerUser } from "../actions/authActions";
-//import { io, Socket } from "socket.io-client";
-
+import { store, useAppSelector } from "../store";
 const Wrapper = styled("div")({
   display: "flex",
   justifyContent: "center",
@@ -51,9 +49,9 @@ const Register = () => {
     username: "",
   });
   const [isFormValid, setIsFormValid] = useState(false);
-  // const { error, errorMessage, userDetails } = useAppSelector(
-  //   (state) => state.auth
-  // );
+  const { message } = useAppSelector(
+    (state) => state.alert
+  );
 
   const dispatch = useDispatch();
 
@@ -72,9 +70,11 @@ const Register = () => {
     setIsFormValid(validateRegisterForm(credentials));
   }, [credentials]);
 
-  // useEffect(() => {
-  //     navigate("/login");
-  // }, [navigate]);
+  useEffect(() => {
+    if (store.getState().alert.message === "Hi 👋. Welcome to KMA. I'm Hiep, the creator of KMA. Please, login by mobile App to active your account 😊."){ 
+      navigate("/login");
+    }
+  }, [message]);
 
   return (
     <AuthBox>
@@ -88,7 +88,7 @@ const Register = () => {
           <Wrapper>
             <Label>Username</Label>
             <Input
-              type="email"
+              type="text"
               placeholder="Enter your username"
               name="username"
               value={credentials.username}

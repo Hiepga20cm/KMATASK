@@ -22,11 +22,11 @@ const roomCreateHandler = require("../socketControllers/room/roomCreateHandler")
 const roomLeaveHandler = require("../socketControllers/room/roomLeaveHandler");
 const roomSignalingDataHandler = require("../socketControllers/room/roomSignalingDataHandler");
 const roomInitializeConnectionHandler = require("../socketControllers/room/roomInitializeConnectionHandler");
-
+const allowedSocketConnections = process.env.allowedSocketConnections
 const createSocketServerAuth = (server) => {
   const ioAuth = socket(server, {
     cors: {
-      origin: ["http://localhost:3000"],
+      origin: ["http://localhost:3000", `${allowedSocketConnections}`],
       methods: ["POST"],
     },
   });
@@ -53,7 +53,7 @@ const createSocketServerAuth = (server) => {
 const createSocketServer = (server) => {
   const io = socket(server, {
     cors: {
-      origin: ["http://localhost:3000", "http://192.168.1.92:3000"],
+      origin: ["http://localhost:3000", `${allowedSocketConnections}`],
       methods: ["GET", "POST"],
     },
   });

@@ -91,6 +91,7 @@ const updateUsersFriendsList = async (userId) => {
         username: 1,
         email: 1,
         _id: 1,
+        publicKey: 1
     });
 
     if (!user) {
@@ -103,6 +104,7 @@ const updateUsersFriendsList = async (userId) => {
                   id: friend._id,
                   username: friend.username,
                   email: friend.email,
+                  publicKey: friend.publicKey
               };
           })
         : [];

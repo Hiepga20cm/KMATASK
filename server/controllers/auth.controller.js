@@ -5,7 +5,6 @@ const nodemailer = require("nodemailer");
 const path = require("path");
 const handlebars = require("handlebars");
 const fs = require("fs");
-const qrCode = require("qrcode");
 const encodedToken = (data) => {
   return jwt.sign(
     {
@@ -52,40 +51,21 @@ const register = async (req, res) => {
       hiepGa.friends = [...hiepGa.friends, user._id];
       await hiepGa.save();
     }
-
-    // create JWT token
-    // const token = jwt.sign(
-    //   {
-    //     userId: user._id,
-    //     email,
-    //     username: user.username,
-    //     active: user.active,
-    //   },
-    //   process.env.JWT_SECRET,
-    //   {
-    //     expiresIn: "15d",
-    //   }
-    // );
-
-   // const qrCode = await createQrCode(token);
-    res.status(201).send("register successfully")
-  } catch (err) {
-    return res.status(500).send("Error occurred. Please try again", err);
+    // const qrCode = await createQrCode(token);
+    return res.status(200).send("register successfully");
+  } catch (error) {
+    return res.status(500).send("Error occurred. Please try again", error);
   }
 };
 
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
-    console.log(req.body);
     const user = await User.findOne({ email: email.toLowerCase() });
-
     if (!user) {
       return res.status(400).send("Invalid credentials. Please try again");
     }
-
     const passwordsMatch = await bcrypt.compare(password, user.password);
-
     if (!passwordsMatch) {
       return res.status(400).send("Invalid credentials. Please try again");
     }
@@ -101,7 +81,6 @@ const login = async (req, res) => {
       process.env.JWT_SECRET,
       {
         expiresIn: "1d",
-        // expiresIn: 60,
       }
     );
 
@@ -130,7 +109,6 @@ const refreshToken = async (req, res) => {
           });
         }
         if (user) {
-          console.log(user);
           const newAccessToken = encodedToken(user);
           return res.json({
             status: "OK",
@@ -167,7 +145,6 @@ const isJwtIdUsed = async (jti, userId) => {
           tokenResetPasswords: null,
         }
       );
-      console.log("done1");
       return true;
     } else {
       return false;
@@ -237,7 +214,18 @@ const forgotPassword = async (req, res) => {
     return res.status(404).json(error);
   }
 };
-
+const powerMod = (base, exponent, modulus) => {
+  let result = 1;
+  base = base % modulus;
+  while (exponent > 0) {
+    if (exponent % 2 === 1) {
+      result = (result * base) % modulus;
+    }
+    exponent = Math.floor(exponent / 2);
+    base = (base * base) % modulus;
+  }
+  return result;
+};
 const resetPassword = async (req, res) => {
   try {
     const decoded = jwt.verify(req.body.accessToken, process.env.SECRET_KEY);
@@ -257,15 +245,19 @@ const resetPassword = async (req, res) => {
   }
 };
 
-const createQrCode = async (token) => {
-  try {
-    const qrCodeUrl = await qrCode.toDataURL(token);
-    console.log(qrCodeUrl);
-    return qrCodeUrl;
-  } catch (error) {
-    console.log(error);
+function generateRandom128BitNumber() {
+  let randomNumber = BigInt(0);
+
+  for (let i = 0; i < 128; i++) {
+    // Tạo một bit ngẫu nhiên (0 hoặc 1)
+    const randomBit = Math.random() < 0.5 ? BigInt(0) : BigInt(1);
+
+    // Dịch trái số hiện tại và thêm bit ngẫu nhiên vào
+    randomNumber = (randomNumber << BigInt(1)) | randomBit;
   }
-};
+
+  return randomNumber.toString();
+}
 const activeUser = async (req, res) => {
   try {
     const { token, password } = req.body;
@@ -277,8 +269,8 @@ const activeUser = async (req, res) => {
         if (!passwordsMatch) {
           return res.status(400).send("Invalid credentials. Please try again");
         }
-        const secretKey = Math.floor(Math.random() * 100) + 1;
-        const publicKey = process.env.g ** secretKey % process.env.p;
+        const secretKey = generateRandom128BitNumber();
+        const publicKey = powerMod(process.env.g, secretKey, process.env.p);
         const activeUser = await User.findOneAndUpdate(
           { _id: user._id },
           { active: true, publicKey: publicKey }
@@ -287,20 +279,20 @@ const activeUser = async (req, res) => {
           const token = jwt.sign(
             {
               userId: activeUser._id,
-              email:activeUser.email,
+              email: activeUser.email,
               username: activeUser.username,
               active: true,
             },
             process.env.JWT_SECRET,
             {
               // expiresIn: "1d",
-               expiresIn: "60d",
+              expiresIn: "60d",
             }
           );
           return res.status(200).json({
             message: "Active user successfully",
             privateKey: secretKey,
-            token : token
+            token: token,
           });
         }
         return res.status(500).send("Something went wrong. Please try again");

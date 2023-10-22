@@ -20,7 +20,7 @@ const RedirectText = styled("span")({
 
 const Login = () => {
   const navigate = useNavigate();
-  const { error, errorMessage, userDetails } = useAppSelector(
+  const { userDetails } = useAppSelector(
     (state) => state.auth
   );
   const [location, setLocation] = useState({});

@@ -4,6 +4,7 @@ import { actionTypes, SetChosenChatDetails, SetMessages, Message, SetTyping, Add
 export const setChosenChatDetails = (chatDetails: {
     userId: string;
     username: string;
+    publicKey: number;
 }): SetChosenChatDetails => {
     return {
         type: actionTypes.setChosenChatDetails,
