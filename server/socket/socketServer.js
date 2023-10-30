@@ -39,14 +39,20 @@ const createSocketServerAuth = (server) => {
       console.log(`Connected auth socket disconnected: ${socket.id}`);
       removeConnectedUserAuth({ socketId: socket.id });
     });
-    socket.on("sendDataTest", (data) => {
-      console.log("send data test :", data);
+    socket.on("sendDataLogin", (data) => {
       const targetSocket = ioAuth.sockets.sockets.get(data?.socketId);
       if (targetSocket) {
         // Gửi dữ liệu đến socket có ID cụ thể
         targetSocket.emit("data-qr-login", data);
       }
     });
+    socket.on("status-login-qr-frontend-to-server", (data) => {
+      const targetSocket = ioAuth.sockets.sockets.get(data?.socketOrgId);
+      if (targetSocket) {
+        // Gửi dữ liệu đến socket có ID cụ thể
+        targetSocket.emit("status-login-qr-server-to-mobile", data?.successfully);
+      }
+    })
   });
 };
 

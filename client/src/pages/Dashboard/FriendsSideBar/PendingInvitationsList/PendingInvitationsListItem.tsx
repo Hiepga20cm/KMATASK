@@ -1,10 +1,10 @@
-import React from "react";
+//import React from "react";
 import { Tooltip, Typography, Box } from "@mui/material";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useTheme } from "@mui/material/styles";
 import InvitationDecisionButtons from "./InvitationDecisionButtons";
 import Avatar from "../../../../components/Avatar";
-import PendingInvitationListItemSmall from "./PendingInvitationListItemSmall";
+//import PendingInvitationListItemSmall from "./PendingInvitationListItemSmall";
 
 
 interface FriendsListItemProps {
@@ -20,7 +20,7 @@ const PendingInvitationsListItem = ({
 }: FriendsListItemProps) => {
 
   const theme = useTheme();
-  const matches = useMediaQuery(theme.breakpoints.up("sm"));
+ // const matches = useMediaQuery(theme.breakpoints.up("sm"));
 
 
   return (

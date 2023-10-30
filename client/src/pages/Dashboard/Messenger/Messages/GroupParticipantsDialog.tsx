@@ -13,7 +13,7 @@ import Avatar from "../../../../components/Avatar";
 import { IconButton, Menu } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import MenuItem from "@mui/material/MenuItem";
-import { useDispatch } from "react-redux";
+//import { useDispatch } from "react-redux";
 
 interface GroupChatDetails {
   groupId: string;
@@ -46,7 +46,7 @@ const GroupParticipantsDialog = ({
   const handleCloseDialog = () => {
     closeDialogHandler();
   };
-  const dispatch = useDispatch();
+  //const dispatch = useDispatch();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const [userDelete,setUserDelete] = useState('')

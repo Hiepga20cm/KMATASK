@@ -7,23 +7,27 @@ import { resetFriendsAction } from "./friendActions";
 import {actionTypes, CurrentUser} from "./types";
 
 export const loginByQrCode = (data : any ) => {
-    if(data){
-        console.log(data);
-        
-        return async (dispatch : Dispatch) => {
-            localStorage.setItem("currentUser", JSON.stringify(data));
-            dispatch({
-                type: actionTypes.authenticate,
-                payload: data            
-            })
-            dispatch(
-                showAlert(
-                 //    `Hi, ${response.userDetails.username} 👋. Welcome back.`
-                 "hi"
-                )
-            );
-        }
+    
+        if(data){
+            // console.log(data);
+            return async (dispatch : Dispatch) => {
+                localStorage.setItem("currentUser", JSON.stringify(data));
+                dispatch({
+                    type: actionTypes.authenticate,
+                    payload: data            
+                })
+                dispatch(
+                    showAlert(
+                     //    `Hi, ${response.userDetails.username} 👋. Welcome back.`
+                     "hi"
+                    )
+                );
+
+            }
+        }else {
+        return "error"
     }
+   
 }
 
 // export const loginUser = (credentials: LoginArgs) => {

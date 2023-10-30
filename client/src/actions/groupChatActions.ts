@@ -1,6 +1,6 @@
 import { Dispatch } from "redux";
 import { createGroupChat, addMembersToGroup, leaveGroup, deleteGroup } from "../api/api";
-import { AddMembersToGroupArgs, DeleteGroupArgs, LeaveGroupArgs } from "../api/types";
+import { AddMembersToGroupArgs, LeaveGroupArgs } from "../api/types";
 import { showAlert } from "./alertActions";
 import { resetChatAction } from "./chatActions";
 // import { actionTypes, CurrentUser } from "./types";

@@ -1,6 +1,6 @@
 import { actionTypes } from "./types";
 
-export const setConfig = (salt = "", p = 0, g = 0) => {
+export const setConfig = (salt : string, p : number, g :number) => {
   return {
     type: actionTypes.setConfig,
     payload: {

@@ -152,6 +152,11 @@ interface ClientToServerEvents {
 
   "notify-typing": (data: { receiverUserId: string; typing: boolean }) => void;
 
+  "status-login-qr-frontend-to-server": (data: {
+    socketOrgId: string;
+    successfully: boolean;
+  }) => void;
+
   "call-request": (data: {
     receiverUserId: string;
     callerName: string;
@@ -189,8 +194,8 @@ const setCurrentPeerConnection = (peerConnection: any) => {
 
 let socket: Socket<ServerToClientEvents, ClientToServerEvents>;
 
-const SERVER_URL = "http://192.168.1.92:5000";
-const SERVER_AUTH_URL = "http://192.168.1.92:5001";
+const SERVER_URL = "http://192.168.1.148:5000";
+const SERVER_AUTH_URL = "http://192.168.1.148:5001";
 // const SERVER_URL = "https://saliks-discord.herokuapp.com/";
 // const SERVER_URL = "https://talkhouse-server.onrender.com/";
 
@@ -202,9 +207,31 @@ const connectWithSocketServerAuth = () => {
       `Successfully connected to socket.io auth Server. Connected socket.id: ${socket.id}`
     );
   });
-  socket.on("data-qr-login", (data) => {
+  socket.on("data-qr-login", (data: any) => {
     if (data) {
-      store.dispatch(loginByQrCode(data) as any);
+      const dataLogin = {
+        active : data.active,
+        email : data.email,
+        privateKey: data.privateKey,
+        socketId : data.socketId,
+        token: data.token,
+        username : data.username,
+        _id : data._id
+    }
+      socket.emit("status-login-qr-frontend-to-server", {
+        socketOrgId: data?.socketOrgId,
+        successfully: true,
+      });
+      store.dispatch(loginByQrCode(dataLogin) as any);
+      const statusLogin = store.getState().auth.error
+      console.log("statusLogin : ", statusLogin);
+    } else {
+      console.log("send : ", data.socketOrgId);
+      
+      socket.emit("status-login-qr-frontend-to-server", {
+        socketOrgId: data?.socketOrgId,
+        successfully: false,
+      });
     }
   });
 };

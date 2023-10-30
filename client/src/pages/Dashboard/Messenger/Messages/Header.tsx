@@ -1,10 +1,10 @@
 import React, { useRef} from "react";
 import { styled } from "@mui/system";
-import Typography from "@mui/material/Typography";
+// import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
 import AddIcCallIcon from "@mui/icons-material/AddIcCall";
 import VideoCallIcon from "@mui/icons-material/VideoCall";
-import Avatar from "../../../../components/Avatar";
+// import Avatar from "../../../../components/Avatar";
 import { useAppSelector } from "../../../../store";
 import { callRequest } from "../../../../socket/socketConnection";
 import ChatDropDown from "./ChatDropDown";
@@ -24,12 +24,12 @@ const MainContainer = styled("div")({
 });
 
 
-const NameWrapper = styled("div")({
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    marginTop: "10px",
-});
+// const NameWrapper = styled("div")({
+//     display: "flex",
+//     alignItems: "center",
+//     justifyContent: "center",
+//     marginTop: "10px",
+// });
 
 
 const CallButtons = styled("div")({
