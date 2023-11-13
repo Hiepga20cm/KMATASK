@@ -8,7 +8,6 @@ WebRTC based peer to peer video calling and messaging web app build with MERN st
 - **`simple-peer`** for peer-to-peer WebRTC connections
 - **`Express`** as server
 - **`MongoDB`** for persistance of data
-- **`Material UI`** for creating ui
 - **`Redux`** for state management
 - **`Typescript`** for type safety, cure for headache you get when props are flowing all over the app with no hint 
 
@@ -28,16 +27,6 @@ WebRTC based peer to peer video calling and messaging web app build with MERN st
 * Accept and reject an incoming call
 
 **and more....**
-
-## New Features added recently:
-
-*  **`Group Chats`** Create group chats like in whats'app. Group Admins can add members to group and participants can leave the group.
-*  Remove friend, ability to unfriend someone
-* **`KMATASK Spaces`** like Twitter spaces. You can host a space and any of your friends can join that space.
-
-The **KMATASK spaces** are implemented using MESH topology to establish a peer-to-peer network between every person or client joining the space.
-i.e, every person maintains a p2p connection with every other person in the room. 
-
 
 # Installation
 
