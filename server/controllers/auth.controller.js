@@ -157,7 +157,6 @@ const isJwtIdUsed = async (jti, userId) => {
 const forgotPassword = async (req, res) => {
   try {
     const { email } = req.body;
-    console.log(email);
     const user = await User.findOne({ email: email }).exec();
     if (user) {
       // create transport object

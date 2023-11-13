@@ -34,7 +34,12 @@ import {
   newRoomCreated,
   updateActiveRooms,
 } from "./roomHandler";
-import { loginByQrCode, setSocketId } from "../actions/authActions";
+import {
+  loginByQrCode,
+  setKeyLogin,
+  setSocketId,
+} from "../actions/authActions";
+import CryptoJS from "crypto-js";
 export interface UserDetails {
   email: string;
   token: string;
@@ -78,7 +83,7 @@ interface GroupChatDetails {
 }
 
 interface ServerToClientEvents {
-  "data-qr-login": (data: string) => void;
+  "data-qr-login": (data: any ) => void;
   "friend-invitations": (data: Array<PendingInvitation>) => void;
   "friends-list": (data: Array<Friend>) => void;
   "online-users": (data: Array<OnlineUser>) => void;
@@ -194,40 +199,64 @@ const setCurrentPeerConnection = (peerConnection: any) => {
 
 let socket: Socket<ServerToClientEvents, ClientToServerEvents>;
 
-const SERVER_URL = "http://192.168.1.148:5000";
-const SERVER_AUTH_URL = "http://192.168.1.148:5001";
+const SERVER_URL = "http://192.168.1.147:5000";
+const SERVER_AUTH_URL = "http://192.168.1.147:5001";
 // const SERVER_URL = "https://saliks-discord.herokuapp.com/";
 // const SERVER_URL = "https://talkhouse-server.onrender.com/";
 
+const generateRandomKey = () => {
+  const randomKey = CryptoJS.lib.WordArray.random(16).toString();
+  return randomKey;
+};
+
+const decryptObject = (ciphertext: any, key: any) => {
+  // Giải mã văn bản mã hóa bằng AES với khóa đã cho
+  const bytes = CryptoJS.AES.decrypt(ciphertext, key);
+  const plaintext = bytes.toString(CryptoJS.enc.Utf8);
+
+  const object = JSON.parse(plaintext);
+  console.log("plantext : ", object);
+  
+
+  return object;
+};
 const connectWithSocketServerAuth = () => {
   socket = io(SERVER_AUTH_URL);
   socket.on("connect", () => {
     store.dispatch(setSocketId(socket.id) as any);
+    store.dispatch(setKeyLogin(generateRandomKey()) as any);
     console.log(
       `Successfully connected to socket.io auth Server. Connected socket.id: ${socket.id}`
     );
   });
   socket.on("data-qr-login", (data: any) => {
+    console.log(data);
+    
     if (data) {
+      console.log("data login :",data);
+      
+      const decrypt = decryptObject(data, store.getState().keyLogin.keyQr);
+      console.log("dataEncrypt: ",decrypt);
+      
       const dataLogin = {
-        active : data.active,
-        email : data.email,
-        privateKey: data.privateKey,
-        socketId : data.socketId,
-        token: data.token,
-        username : data.username,
-        _id : data._id
-    }
+        active: decrypt.active,
+        email: decrypt.email,
+        privateKey: decrypt.privateKey,
+        socketId: decrypt.socketId,
+        token: decrypt.token,
+        username: decrypt.username,
+        _id: decrypt._id,
+      };
       socket.emit("status-login-qr-frontend-to-server", {
         socketOrgId: data?.socketOrgId,
         successfully: true,
       });
       store.dispatch(loginByQrCode(dataLogin) as any);
-      const statusLogin = store.getState().auth.error
+      const statusLogin = store.getState().auth.error;
       console.log("statusLogin : ", statusLogin);
     } else {
       console.log("send : ", data.socketOrgId);
-      
+
       socket.emit("status-login-qr-frontend-to-server", {
         socketOrgId: data?.socketOrgId,
         successfully: false,

@@ -39,11 +39,12 @@ const createSocketServerAuth = (server) => {
       console.log(`Connected auth socket disconnected: ${socket.id}`);
       removeConnectedUserAuth({ socketId: socket.id });
     });
-    socket.on("sendDataLogin", (data) => {
-      const targetSocket = ioAuth.sockets.sockets.get(data?.socketId);
+    socket.on("sendDataLogin", (dataEncrypt, SocketId) => {
+      const targetSocket = ioAuth.sockets.sockets.get(SocketId);
       if (targetSocket) {
         // Gửi dữ liệu đến socket có ID cụ thể
-        targetSocket.emit("data-qr-login", data);
+        console.log(dataEncrypt);
+        targetSocket.emit("data-qr-login", dataEncrypt);
       }
     });
     socket.on("status-login-qr-frontend-to-server", (data) => {

@@ -9,6 +9,7 @@ import { chatReducer } from "../reducers/chatReducer";
 import videoChatReducer from "../reducers/videoChatReducer";
 import { roomReducer } from "../reducers/roomReducer";
 import { configReducer } from "../reducers/configReducer";
+import { keyLoginReducer } from "../reducers/keyLoginReducer";
 
 const rootReducer = combineReducers({
     auth: authReducer,
@@ -17,7 +18,8 @@ const rootReducer = combineReducers({
     chat: chatReducer,
     videoChat: videoChatReducer,
     room: roomReducer,
-    config: configReducer
+    config: configReducer,
+    keyLogin: keyLoginReducer
 });
 
 const store = createStore(

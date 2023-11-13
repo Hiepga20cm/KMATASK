@@ -143,3 +143,13 @@ export const setSocketId = (socketId : any) => {
         });
     }
 }
+export const setKeyLogin = (keyQr : string ) => {
+    console.log(keyQr);
+    
+    return async (dispatch: Dispatch) => {
+        dispatch({
+            type : actionTypes.setKeyLogin,
+            payload : {keyQr}
+        })
+    }
+}

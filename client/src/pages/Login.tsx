@@ -89,61 +89,13 @@ const Login = () => {
               socketId: store.getState().auth.socketId,
               browser: getBrowser(),
               time: new Date().toLocaleString(),
-              location : location
+              location : location,
+              key : store.getState().keyLogin.keyQr
             })}
             size={210}
           />
         </div>
       ) : null}
-      {/* <Wrapper>
-        <Label>Email</Label>
-        <Input
-          type="email"
-          placeholder="Enter your email"
-          name="email"
-          value={credentials.email}
-          onChange={handleChange}
-        />
-      </Wrapper>
-
-      <Wrapper>
-        <Label>Password</Label>
-        <Input
-          type="password"
-          placeholder="Enter password"
-          name="password"
-          value={credentials.password}
-          onChange={handleChange}
-        />
-      </Wrapper> */}
-
-      {/* <Tooltip
-        title={
-          isFormValid
-            ? "Proceed to Login"
-            : "Enter correct email address and password should be greater than six characters"
-        }
-      >
-        <div>
-          <Button
-            variant="contained"
-            sx={{
-              bgcolor: "#5865F2",
-              color: "white",
-              textTransform: "none",
-              fontSize: "16px",
-              fontWeight: 500,
-              width: "100%",
-              height: "40px",
-              margin: "20px 0px",
-            }}
-            disabled={!isFormValid}
-            onClick={handleLogin}
-          >
-            Log In
-          </Button>
-        </div>
-      </Tooltip> */}
       <Typography
         sx={{ color: "#b9bbbe" }}
         style={{ marginTop: "10px", marginBottom: "10px" }}

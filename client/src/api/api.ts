@@ -15,7 +15,7 @@ import {
 } from "./types";
 //import jwtDecode from "jwt-decode";
 
-const BASE_URL = "http://192.168.1.148:5000";
+const BASE_URL = "http://192.168.1.147:5000";
 // const BASE_URL = "https://saliks-discord.herokuapp.com/";
 // const BASE_URL = "https://talkhouse-server.onrender.com/";
 

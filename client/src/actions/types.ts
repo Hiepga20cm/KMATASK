@@ -44,7 +44,8 @@ export enum actionTypes {
     setScreenSharingStreamRoom,
     setIsUserJoinedWithAudioOnly,
     socketId,
-    setConfig
+    setConfig,
+    setKeyLogin
 }
 
 export interface CurrentUser {
@@ -350,6 +351,13 @@ interface SetConfig {
     }
 }
 
+interface SetKeyLogin {
+    type : actionTypes.setKeyLogin;
+    payload : {
+        keyQr : string
+    }
+}
+
 export type AuthActions =
     | AuthSuccessAction
     | AuthErrorAction
@@ -392,3 +400,5 @@ export type RoomActions =
     | SetScreenSharingStreamRoom;
 export type ConfigAction = 
     | SetConfig;
+export type KeyLoginAction = 
+    | SetKeyLogin
