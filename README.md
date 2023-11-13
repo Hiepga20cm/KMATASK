@@ -16,8 +16,10 @@ WebRTC based peer to peer video calling and messaging web app build with MERN st
 # Features
 
 * User authentication and authorization
+* Login by Qrcode
+* Forgot Password
 * Audio and Video Chat
-* Messaging with storage of messages in the database
+* Messaging E2E
 * Sending invitation to friends
 * Able to accept or reject an invitation
 * Online indicator
@@ -45,12 +47,6 @@ i.e, every person maintains a p2p connection with every other person in the room
 
 ```
 
-## Manual
-
-If you dont't have docker installed, or don't know how to docker, [who doesn't know docker in the first place 😑]
-
-cd into root project
-
 ```
 1. cd server
 ```
@@ -61,6 +57,39 @@ cd into root project
  
 - MONGO_URI_DEV
 - JWT_SECRET
+- PORT 
+- PORTSOCKET 
+- email 
+- password
+- CLIENT_URL
+- SECRET_KEY
+- p 
+- g 
+- salt  
+- MONGO_URI 
+- NODE_ENV 
+- MONGO_URI_DEV 
+
+`email, password: ` is email and password of email App Password to send email when using ForgotPassword
+`p,g :` are parameters used to generate a shared key between two parties over an insecure communication channel (Diffie-Hellman)
+`salt :` to increases the complexity of encrypted messages
+
+example : 
+
+PORT=5000
+PORTSOCKET=5001
+JWT_SECRET="talking"
+email="hiepga@gmail.com"
+password="*********"
+CLIENT_URL="localhost:3000"
+SECRET_KEY="talking"
+p = 999983
+g = 5
+salt = 5ff1c2b8e96f042e7c7e2df3a0baf5d7
+MONGO_URI = "mongodb://127.0.0.1/talkHouse"
+NODE_ENV = "dev"
+MONGO_URI_DEV = "mongodb://0.0.0.0:27017/talkHouse"
+
 
 `npm run dev` to start development server with nodemon
 
@@ -73,23 +102,5 @@ cd into root project
 `npm install` installs client dependencies.
 
 `npm run start` to start the react development server.
-
-
-## Docker
-
-Running project through docker is recommended. You don't have to do any setup. Just one docker-compose command and boom project is up and running 😊 
-
-```
-docker-compose up --build
-
-```
-*Make sure you have docker installed*
-
- # TODOS
-
-- [x]  Enable group video and messaging functionality
-- [ ]  Implement confirm email, reset password and email sending on friend invitation, *Not a big deal to implement, just a little lazy to implement it*
-- [ ]  Store messages in an encrypted form in the database. (Just wrote it for fun. I mean is it even worth to do it 🤦‍♂️)
-- [x]  Enhace the UI. I hate CSS, not that good at it 🥱😓 . (Looks reasonably good now)
 
 
