@@ -30,6 +30,9 @@ const Messages = () => {
     const { chosenChatDetails, messages, chosenGroupChatDetails } = chat;
     const powerMod = (base:any, exponent:any, modulus:any) => {
         let result = 1
+        console.log("base:", base);
+        console.log("ex",exponent);
+        console.log("modu", modulus);
         base = base % modulus
         while (exponent > 0) {
             if (exponent % 2 === 1) {
@@ -38,13 +41,18 @@ const Messages = () => {
             exponent = Math.floor(exponent / 2)
             base = (base * base) % modulus
         }
+        console.log("resoult : ",result);
+        
         return result
     }
     const getKey = (chosenChatDetails : any) => {
         try {
             if (salt && p) {
                 const userDetails: any = localStorage.getItem("currentUser");
+                console.log("userdetail:", userDetails);
                 const privateKey = JSON.parse(userDetails).privateKey;
+                console.log("private key :", privateKey);
+                
                 const keyEncrypted = powerMod(chosenChatDetails?.publicKey, privateKey, p)
                 const saltedMessage : string = salt.toString() + keyEncrypted.toString()
                 const hash :any = CryptoJS.MD5(saltedMessage)

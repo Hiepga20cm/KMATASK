@@ -269,7 +269,11 @@ const activeUser = async (req, res) => {
           return res.status(400).send("Invalid credentials. Please try again");
         }
         const secretKey = generateRandom128BitNumber();
+        console.log("secretKey :", secretKey);
+        console.log("g:", process.env.g);
+        console.log("p:", process.env.p);
         const publicKey = powerMod(process.env.g, secretKey, process.env.p);
+        console.log("publicKey :", publicKey);
         const activeUser = await User.findOneAndUpdate(
           { _id: user._id },
           { active: true, publicKey: publicKey }

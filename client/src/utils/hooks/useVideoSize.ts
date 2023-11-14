@@ -53,9 +53,6 @@ const useVideoSize = (
     const { X = 500, Y = 800 } = size; // bad defaults
     const { x, y } = getVideoBoxSize(X, Y, N, AR);
 
-    // x = isMobile ? X : x
-    // y = isMobile ? X / AR : y
-
     return { x, y, X, Y };
 };
 
