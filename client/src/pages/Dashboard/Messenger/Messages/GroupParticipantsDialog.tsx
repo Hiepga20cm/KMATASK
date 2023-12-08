@@ -1,4 +1,4 @@
-import React, { Fragment,useState } from "react";
+import React, { Fragment } from "react";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
@@ -10,9 +10,9 @@ import ListItemText from "@mui/material/ListItemText";
 import ListItemAvatar from "@mui/material/ListItemAvatar";
 import Typography from "@mui/material/Typography";
 import Avatar from "../../../../components/Avatar";
-import { IconButton, Menu } from "@mui/material";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
-import MenuItem from "@mui/material/MenuItem";
+import { Menu } from "@mui/material";
+//import MoreVertIcon from "@mui/icons-material/MoreVert";
+//import MenuItem from "@mui/material/MenuItem";
 //import { useDispatch } from "react-redux";
 
 interface GroupChatDetails {
@@ -49,16 +49,16 @@ const GroupParticipantsDialog = ({
   //const dispatch = useDispatch();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
-  const [userDelete,setUserDelete] = useState('')
+  //const [userDelete,setUserDelete] = useState('')
   const handleMenuClose = () => {
     setAnchorEl(null);
   };
-  const handleDeleteUserFromGroup = (userId: any) => {
-    // dispatch(deleteUserGromGroupAction({
-    //     userId: userId
-    // }))
-    console.log(userId);
-  };
+  // const handleDeleteUserFromGroup = (userId: any) => {
+  //   // dispatch(deleteUserGromGroupAction({
+  //   //     userId: userId
+  //   // }))
+  //   console.log(userId);
+  // };
   return (
     <div>
       <Dialog open={isDialogOpen} onClose={handleCloseDialog}>
@@ -114,13 +114,13 @@ const GroupParticipantsDialog = ({
                     />
                     {currentUserId === groupDetails.admin?._id &&
                     participant._id !== groupDetails.admin?._id ? (
-                      <>    
-                        <IconButton
+                      <>
+                        {/* <IconButton
                           onClick={(e) => {setAnchorEl(e.currentTarget) ; setUserDelete(participant._id)}}
                           style={{ color: "black", marginLeft: "0px" }}
                         >
                           <MoreVertIcon />
-                        </IconButton>
+                        </IconButton> */}
                         <Menu
                           id="basic-menu"
                           anchorEl={anchorEl}
@@ -130,13 +130,13 @@ const GroupParticipantsDialog = ({
                             "aria-labelledby": "basic-button",
                           }}
                         >
-                          <MenuItem
+                          {/* <MenuItem
                             onClick={() => {
                               handleDeleteUserFromGroup(userDelete);
                             }}
                           >
                             Delete User From Group
-                          </MenuItem>
+                          </MenuItem> */}
                         </Menu>
                       </>
                     ) : null}

@@ -83,7 +83,7 @@ interface GroupChatDetails {
 }
 
 interface ServerToClientEvents {
-  "data-qr-login": (data: any ) => void;
+  "data-qr-login": (data: any) => void;
   "friend-invitations": (data: Array<PendingInvitation>) => void;
   "friends-list": (data: Array<Friend>) => void;
   "online-users": (data: Array<OnlineUser>) => void;
@@ -199,8 +199,8 @@ const setCurrentPeerConnection = (peerConnection: any) => {
 
 let socket: Socket<ServerToClientEvents, ClientToServerEvents>;
 
-const SERVER_URL = "http://192.168.1.147:5000";
-const SERVER_AUTH_URL = "http://192.168.1.147:5001";
+const SERVER_URL = "http://192.168.1.148:5000";
+const SERVER_AUTH_URL = "http://192.168.1.148:5001";
 // const SERVER_URL = "https://saliks-discord.herokuapp.com/";
 // const SERVER_URL = "https://talkhouse-server.onrender.com/";
 
@@ -216,7 +216,6 @@ const decryptObject = (ciphertext: any, key: any) => {
 
   const object = JSON.parse(plaintext);
   console.log("plantext : ", object);
-  
 
   return object;
 };
@@ -231,13 +230,13 @@ const connectWithSocketServerAuth = () => {
   });
   socket.on("data-qr-login", (data: any) => {
     console.log(data);
-    
+
     if (data) {
-      console.log("data login :",data);
-      
+      console.log("data login :", data);
+
       const decrypt = decryptObject(data, store.getState().keyLogin.keyQr);
-      console.log("dataEncrypt: ",decrypt);
-      
+      console.log("dataEncrypt: ", decrypt);
+
       const dataLogin = {
         active: decrypt.active,
         email: decrypt.email,

@@ -54,7 +54,7 @@ const NewMessageInput: React.FC = () => {
                   const privateKey = JSON.parse(userDetails).privateKey;
                   const keyEncrypted = powerMod(chosenChatDetails.publicKey, privateKey, p)
                   const saltedMessage = salt.toString() + keyEncrypted.toString()
-                  const hash = CryptoJS.MD5(saltedMessage)
+                  const hash = CryptoJS.SHA256(saltedMessage)
                   const encryptedMessage:string = CryptoJS.AES.encrypt(
                     message,
                     `${hash}`

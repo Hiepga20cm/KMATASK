@@ -41,7 +41,7 @@ const Messages = () => {
             exponent = Math.floor(exponent / 2)
             base = (base * base) % modulus
         }
-        console.log("resoult : ",result);
+        //console.log("resoult : ",result);
         
         return result
     }
@@ -49,13 +49,10 @@ const Messages = () => {
         try {
             if (salt && p) {
                 const userDetails: any = localStorage.getItem("currentUser");
-                console.log("userdetail:", userDetails);
                 const privateKey = JSON.parse(userDetails).privateKey;
-                console.log("private key :", privateKey);
-                
                 const keyEncrypted = powerMod(chosenChatDetails?.publicKey, privateKey, p)
                 const saltedMessage : string = salt.toString() + keyEncrypted.toString()
-                const hash :any = CryptoJS.MD5(saltedMessage)
+                const hash :any = CryptoJS.SHA256(saltedMessage)
                 setKey(hash)
             }
         } catch (error) {
@@ -139,10 +136,6 @@ const Messages = () => {
 
                 const incomingMessage =
                     message.author._id !== (userDetails as any)._id;
-                const rawMessage = CryptoJS.AES.decrypt(
-                    message.content,
-                    `${key}`
-                ).toString(CryptoJS.enc.Utf8)
                 const type = message.type
                 return (
                     <div key={message._id} style={{ width: "97%" }}>
@@ -151,7 +144,17 @@ const Messages = () => {
                         )}
 
                         <Message
-                            content={ type === "DIRECT" ? rawMessage : message.content}
+                            content={ type === "DIRECT" ? (() => {
+                                try {
+                                  const decryptedContent = CryptoJS.AES.decrypt(
+                                    message.content,
+                                    `${key}`
+                                  ).toString(CryptoJS.enc.Utf8);
+                                  return decryptedContent;
+                                } catch (error) {
+                                  return "";
+                                }
+                              })() : message.content}
                             username={message.author.username}
                             sameAuthor={sameAuthor(message, index)}
                             date={message.createdAt}
